@@ -559,7 +559,7 @@
     <string name="installing_backend_message">正在设置后端。这需要一些时间。</string>
     <string name="keep_editing">继续编辑</string>
     <string name="limit_pids_hint">留空则无限制</string>
-    <string name="anland_not_installed">不可用：需安装 Anland 5.x，且不支持 Anland 6.x。</string>
+    <string name="anland_not_installed">不可用：需安装 Anland 或 Anland Next 应用。</string>
     <string name="force_cgroupv1_not_supported">不可用：当前内核只支持 cgroup v1，无须强制。</string>
     <string name="easter_egg_reward">谁让你问的 🎵</string>
     <string name="anland_option">Anland</string>

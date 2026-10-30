@@ -9,10 +9,10 @@ name: Droidspaces CI
 # throwaway key when they are not (a fork, a pull request).
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "dev" ]
     tags: [ 'v*' ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "dev" ]
   workflow_dispatch:
     inputs:
       tag_name:

@@ -240,7 +240,7 @@
     <string name="enable_anland_description">Show a Wayland desktop in the Anland app</string>
     <string name="launch_x11_description">Show the X11 desktop in the Termux:X11 app</string>
     <string name="launch_anland_window">Launch</string>
-    <string name="anland_not_installed">Not available. Needs the Anland 5.x app installed. Anland 6.x is not supported.</string>
+    <string name="anland_not_installed">Not available. Needs the Anland app installed.</string>
     <string name="anland_needs_gpu">Needs GPU Access or Hardware Access.</string>
     <string name="anland_replaces_x11">Off while Anland Display is on. A container uses one display path.</string>
     <string name="x11_replaces_anland">Off while Configure Termux:X11 is on. A container uses one display path.</string>

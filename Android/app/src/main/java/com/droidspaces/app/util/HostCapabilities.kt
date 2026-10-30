@@ -94,7 +94,7 @@ data class HostCapabilities(
         private fun appFlags(context: Context) = mapOf(
             "termux" to installed(context, "com.termux"),
             "termux_x11" to installed(context, "com.termux.x11"),
-            "anland" to installed(context, "com.anland.consumer")
+            "anland" to (installed(context, "com.anland.consumer") || installed(context, "com.anlandnext"))
         )
 
         private fun installed(context: Context, pkg: String) =

@@ -5,14 +5,21 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 
-/** The Anland 5.x consumer app, which shows a container's Wayland desktop. */
+/** The Anland consumer app, which shows a container's Wayland desktop. */
 object AnlandUtils {
 
-    private const val CONSUMER_PACKAGE = "com.anland.consumer"
-    private const val CONSUMER_ACTIVITY = "com.anland.consumer.SecondaryActivity"
+    private const val CONSUMER_PACKAGE_V5 = "com.anland.consumer"
+    private const val CONSUMER_ACTIVITY_V5 = "com.anland.consumer.SecondaryActivity"
+
+    private const val CONSUMER_PACKAGE_V6 = "com.anlandnext"
+    private const val CONSUMER_ACTIVITY_V6 = "com.anlandnext.MainActivity"
+
     // Matches MainActivity.EXTRA_SOCKET_PATH / EXTRA_WINDOW_NAME in the consumer app.
     private const val EXTRA_SOCKET_PATH = "socket_path"
     private const val EXTRA_WINDOW_NAME = "window_name"
+
+    private fun isInstalled(context: Context, pkg: String): Boolean =
+        try { context.packageManager.getPackageInfo(pkg, 0); true } catch (e: Exception) { false }
 
     /**
      * Opens the consumer's window for this container's display socket, titled with
@@ -21,8 +28,13 @@ object AnlandUtils {
      * refuses the intent, so the caller can say so.
      */
     fun launchWindow(context: Context, containerName: String, socketPath: String): Boolean {
+        val (pkg, act) = if (isInstalled(context, CONSUMER_PACKAGE_V6)) {
+            CONSUMER_PACKAGE_V6 to CONSUMER_ACTIVITY_V6
+        } else {
+            CONSUMER_PACKAGE_V5 to CONSUMER_ACTIVITY_V5
+        }
         val intent = Intent(Intent.ACTION_MAIN).apply {
-            component = ComponentName(CONSUMER_PACKAGE, CONSUMER_ACTIVITY)
+            component = ComponentName(pkg, act)
             putExtra(EXTRA_SOCKET_PATH, socketPath)
             putExtra(EXTRA_WINDOW_NAME, containerName)
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_MULTIPLE_TASK)

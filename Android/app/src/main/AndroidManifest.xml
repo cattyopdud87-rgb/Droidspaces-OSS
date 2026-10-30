@@ -19,6 +19,7 @@
         <package android:name="com.termux" />
         <package android:name="com.termux.x11" />
         <package android:name="com.anland.consumer" />
+        <package android:name="com.anlandnext" />
     </queries>
 
     <application
