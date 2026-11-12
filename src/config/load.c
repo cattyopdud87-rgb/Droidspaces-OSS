@@ -192,6 +192,16 @@ int ds_config_load_file(FILE *f, struct ds_config *cfg) {
         cfg->pids_limit = v;
       else
         ds_warn("config: ignoring invalid pids_limit '%s'", val);
+    } else if (strcmp(key, "cpuset") == 0 || strcmp(key, "cpuset_cpus") == 0) {
+      safe_strncpy(cfg->cpuset_cpus, val, sizeof(cfg->cpuset_cpus));
+    } else if (strcmp(key, "cpuset_mems") == 0) {
+      safe_strncpy(cfg->cpuset_mems, val, sizeof(cfg->cpuset_mems));
+    } else if (strcmp(key, "swappiness") == 0) {
+      int s = atoi(val);
+      if (s >= 0 && s <= 100)
+        cfg->swappiness = s;
+      else
+        ds_warn("config: ignoring invalid swappiness '%s' (0..100)", val);
     } else if (strcmp(key, "privileged") == 0) {
       if (parse_privileged(val, cfg) < 0)
         ds_warn("config: privileged mode off until the tag is fixed");

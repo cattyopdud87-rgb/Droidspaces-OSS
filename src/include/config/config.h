@@ -190,6 +190,9 @@ struct ds_config {
   long long cpu_quota;    /* us per period */
   long long cpu_period;   /* us (default 100000) */
   long long pids_limit;
+  char cpuset_cpus[64]; /* cpuset.cpus core range (e.g. "0-5") */
+  char cpuset_mems[32]; /* cpuset.mems NUMA nodes (default "0") */
+  int swappiness;       /* memory.swappiness (0-100, -1 = unconfigured) */
 
   /* Resource virtualization (auto-enabled when limits are set) */
   struct timespec start_time; /* container start time (CLOCK_MONOTONIC) */

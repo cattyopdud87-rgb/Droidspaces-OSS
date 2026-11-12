@@ -52,6 +52,12 @@ static void ds_config_serialize_known(FILE *f, struct ds_config *cfg) {
     fprintf(f, "cpu_period=%lld\n", cfg->cpu_period);
   if (cfg->pids_limit > 0)
     fprintf(f, "pids_limit=%lld\n", cfg->pids_limit);
+  if (cfg->cpuset_cpus[0])
+    fprintf(f, "cpuset_cpus=%s\n", cfg->cpuset_cpus);
+  if (cfg->cpuset_mems[0])
+    fprintf(f, "cpuset_mems=%s\n", cfg->cpuset_mems);
+  if (cfg->swappiness >= 0 && cfg->swappiness <= 100)
+    fprintf(f, "swappiness=%d\n", cfg->swappiness);
 
   if (cfg->privileged_bad[0]) {
     fprintf(f, "privileged=%s\n", cfg->privileged_bad);

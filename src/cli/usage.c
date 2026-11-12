@@ -105,6 +105,8 @@ void print_usage(void) {
       "      --allow-swap          Let a memory-limited container use host "
       "swap\n"
       "      --cpus=COUNT          CPU limit (e.g. 1.5, 2)\n"
+      "      --cpuset=CPUS         Pin CPUs/cores (e.g. 0-5)\n"
+      "      --swappiness=VAL      Memory swappiness 0-100 (e.g. 10)\n"
       "      --pids-limit=N        Max number of PIDs\n"
       "      --privileged=TAGS     Relax security: nomask, nocaps, noseccomp, "
       "shared, full\n"

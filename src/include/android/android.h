@@ -47,6 +47,7 @@ void android_remount_data_suid(void);
 int android_setup_storage(const char *rootfs_path);
 
 /* anland/anland.c */
+void ds_anland_sweep_stale_sockets(void);
 int ds_anland_daemon_start(struct ds_config *cfg);
 void ds_anland_daemon_stop(struct ds_config *cfg);
 int ds_setup_anland_socket(struct ds_config *cfg);

@@ -20,6 +20,20 @@ void android_optimizations(int enable) {
 
   if (enable) {
     ds_log("Applying Android system optimizations...");
+    /* 32-bit Bionic pthread_mutex_t TID limit <= 65535:
+     * Qualcomm vendor audio HAL (audio.primary.sm6150.so) is 32-bit ELF32.
+     * When any thread TID exceeds 65535, pthread_mutex_t locks hard-abort.
+     * Ensure /proc/sys/kernel/pid_max never exceeds 65535 on Android. */
+    char pbuf[32];
+    if (read_file("/proc/sys/kernel/pid_max", pbuf, sizeof(pbuf)) > 0) {
+      long long pmax = atoll(pbuf);
+      if (pmax > 65535 || pmax <= 0) {
+        ds_log(
+            "[Android] Clamping /proc/sys/kernel/pid_max to 65535 (was %lld)",
+            pmax);
+        write_file("/proc/sys/kernel/pid_max", "65535\n");
+      }
+    }
     char *args1[] = {"cmd",
                      "device_config",
                      "put",

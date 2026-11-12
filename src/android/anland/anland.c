@@ -89,6 +89,43 @@ void ds_anland_load_sock(struct ds_config *cfg) {
   cfg->anland_sock[strcspn(cfg->anland_sock, "\r\n")] = '\0';
 }
 
+/* Sweep stale anland-*.sock files left behind in get_net_dir() by crashed
+ * daemons */
+void ds_anland_sweep_stale_sockets(void) {
+  const char *net_dir = get_net_dir();
+  DIR *d = opendir(net_dir);
+  if (!d)
+    return;
+
+  struct dirent *de;
+  while ((de = readdir(d)) != NULL) {
+    if (strncmp(de->d_name, "anland-", 7) != 0 || !strstr(de->d_name, ".sock"))
+      continue;
+
+    char path[PATH_MAX];
+    snprintf(path, sizeof(path), "%s/%s", net_dir, de->d_name);
+
+    int s = socket(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC | SOCK_NONBLOCK, 0);
+    if (s < 0)
+      continue;
+
+    struct sockaddr_un addr;
+    memset(&addr, 0, sizeof(addr));
+    addr.sun_family = AF_UNIX;
+    safe_strncpy(addr.sun_path, path, sizeof(addr.sun_path));
+
+    /* If connect fails with ECONNREFUSED or ENOENT, no daemon is listening */
+    if (connect(s, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+      if (errno == ECONNREFUSED || errno == ENOENT) {
+        ds_log("[Anland] Removing stale daemon socket: %s", path);
+        unlink(path);
+      }
+    }
+    close(s);
+  }
+  closedir(d);
+}
+
 /* public API */
 
 int ds_anland_daemon_start(struct ds_config *cfg) {
@@ -98,6 +135,8 @@ int ds_anland_daemon_start(struct ds_config *cfg) {
     ds_error("[Anland] not running as root");
     return -1;
   }
+
+  ds_anland_sweep_stale_sockets();
 
   char pidfile[NAME_MAX + 16], sockfile[NAME_MAX + 16];
   anland_record_name(cfg, ANLAND_PID_EXT, pidfile, sizeof(pidfile));
@@ -172,6 +211,7 @@ void ds_anland_daemon_stop(struct ds_config *cfg) {
                         pidfile, cfg->anland_sock[0] ? cfg->anland_sock : NULL,
                         "[Anland]");
   ds_daemon_remove_pid(sockfile);
+  ds_anland_sweep_stale_sockets();
 }
 
 /* socket bridge */

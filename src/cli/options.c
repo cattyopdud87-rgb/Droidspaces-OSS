@@ -165,6 +165,11 @@ const struct option long_options[] = {
     {"json", no_argument, 0, 265},
     {"memory", required_argument, 0, 266},
     {"cpus", required_argument, 0, 267},
+    {"cpuset", required_argument, 0, 285},
+    {"cpusets", required_argument, 0, 285},
+    {"cpuset-cpus", required_argument, 0, 285},
+    {"cpuset-mems", required_argument, 0, 286},
+    {"swappiness", required_argument, 0, 287},
     {"pids-limit", required_argument, 0, 268},
     {"init", required_argument, 0, 269},
     {"help", no_argument, 0, 'v'},
@@ -473,6 +478,21 @@ int ds_apply_cli_overrides(int argc, char **argv, struct ds_config *cfg,
       }
       safe_strncpy(cfg->custom_init, optarg, sizeof(cfg->custom_init));
       break;
+    case 285:
+      safe_strncpy(cfg->cpuset_cpus, optarg, sizeof(cfg->cpuset_cpus));
+      break;
+    case 286:
+      safe_strncpy(cfg->cpuset_mems, optarg, sizeof(cfg->cpuset_mems));
+      break;
+    case 287: {
+      int s = atoi(optarg);
+      if (s < 0 || s > 100) {
+        ds_error("--swappiness: invalid value (must be 0..100): %s", optarg);
+        return -1;
+      }
+      cfg->swappiness = s;
+      break;
+    }
     default:
       break;
     }

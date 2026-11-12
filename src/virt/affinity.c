@@ -13,6 +13,29 @@
  * This ensures tools like nproc and htop that use sched_getaffinity()
  * see the correct number of available cores. */
 void ds_virtualize_affinity(struct ds_config *cfg) {
+  if (cfg->cpuset_cpus[0]) {
+    cpu_set_t cpuset_mask;
+    CPU_ZERO(&cpuset_mask);
+    for (const char *p = cfg->cpuset_cpus; *p;) {
+      char *end;
+      long a = strtol(p, &end, 10);
+      if (end == p) {
+        p++;
+        continue;
+      }
+      long b = a;
+      if (*end == '-')
+        b = strtol(end + 1, &end, 10);
+      for (long i = a; i >= 0 && i <= b && i < CPU_SETSIZE; i++)
+        CPU_SET((int)i, &cpuset_mask);
+      p = end;
+    }
+    if (CPU_COUNT(&cpuset_mask) > 0) {
+      sched_setaffinity(0, sizeof(cpu_set_t), &cpuset_mask);
+      return;
+    }
+  }
+
   int n = container_cpus(cfg);
   int host = (int)sysconf(_SC_NPROCESSORS_ONLN);
   if (n >= host || n <= 0)

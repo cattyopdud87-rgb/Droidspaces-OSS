@@ -41,6 +41,10 @@ static int apply_limit(struct ds_config *cfg, const char *ctrl,
   }
 
   snprintf(path, sizeof(path), "%s/%s", dir, file);
+  if (access(path, F_OK) != 0 && strncmp(file, "cpuset.", 7) == 0) {
+    /* Android mounts cpuset with noprefix (cpus, mems) */
+    snprintf(path, sizeof(path), "%s/%s", dir, file + 7);
+  }
   if (ver == 0 && ds_cgroup_has_controller(ctrl)) {
     /* The kernel has it, we just cannot get at it: not in our cgroup2 dir
      * and on no v1 hierarchy we can find. Do not blame the kernel config. */
@@ -130,6 +134,21 @@ void ds_cgroup_apply_limits(struct ds_config *cfg) {
             "CONFIG_CGROUP_PIDS, and no cgroup_disable=pids on the kernel "
             "command line"))
       cfg->pids_limit = 0;
+  }
+  if (cfg->cpuset_cpus[0]) {
+    const char *mems = cfg->cpuset_mems[0] ? cfg->cpuset_mems : "0";
+    apply_limit(cfg, "cpuset", "cpuset.mems", mems, "cpuset.mems", mems,
+                "CONFIG_CPUSETS");
+    if (!apply_limit(cfg, "cpuset", "cpuset.cpus", cfg->cpuset_cpus,
+                     "cpuset.cpus", cfg->cpuset_cpus, "CONFIG_CPUSETS")) {
+      cfg->cpuset_cpus[0] = '\0';
+    }
+  }
+  if (cfg->swappiness >= 0 && cfg->swappiness <= 100) {
+    char sval[16];
+    snprintf(sval, sizeof(sval), "%d", cfg->swappiness);
+    apply_limit(cfg, "memory", "memory.swappiness", sval, "memory.swappiness",
+                sval, "CONFIG_MEMCG");
   }
 }
 
