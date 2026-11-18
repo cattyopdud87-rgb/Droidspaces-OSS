@@ -34,6 +34,9 @@ void android_optimizations(int enable) {
         write_file("/proc/sys/kernel/pid_max", "65535\n");
       }
     }
+    /* Android 15 cpuset fix: ensure Gold Core 6 (0-7) is never masked out in foreground/top-app */
+    write_file("/dev/cpuset/foreground/cpus", "0-7\n");
+    write_file("/dev/cpuset/top-app/cpus", "0-7\n");
     char *args1[] = {"cmd",
                      "device_config",
                      "put",

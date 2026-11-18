@@ -137,7 +137,9 @@ SRCS = $(SRC_DIR)/main.c \
        $(SRC_DIR)/android/anland/display_daemon.c
 
 # Hardened warning set, all warnings are errors
-CFLAGS  = -Wall -Wextra -Wpedantic -Werror -O2 -flto=auto -std=gnu99 -I$(SRC_DIR)/include -no-pie -pthread
+# ARMv8.2-A Kryo 470 (Cortex-A76 + Cortex-A55) DynamIQ optimizations with LTO
+CFLAGS  = -Wall -Wextra -Wpedantic -Werror -O3 -flto=auto -std=gnu99 -I$(SRC_DIR)/include -pthread
+CFLAGS += -march=armv8.2-a+dotprod+fp16 -mtune=cortex-a76.cortex-a55
 CFLAGS += -Wformat=2 -Wformat-security -Wformat-overflow=2 -Wformat-truncation=2
 CFLAGS += -Wnull-dereference -Wcast-qual -Wlogical-op -Wshadow -Wdouble-promotion -Wundef
 CFLAGS += -Wduplicated-cond -Wduplicated-branches -Wimplicit-fallthrough=3
@@ -145,7 +147,7 @@ CFLAGS += -fstack-protector-strong
 # A header edit rebuilds every object that includes it
 CFLAGS += -MMD -MP
 # LTO raises some warnings only at link time, and they are failures there too
-LDFLAGS = -static -no-pie -flto=auto -pthread -Werror
+LDFLAGS = -static -flto=auto -pthread -Werror
 ifeq ($(NO_STRIP),)
   LDFLAGS += -s
 endif
